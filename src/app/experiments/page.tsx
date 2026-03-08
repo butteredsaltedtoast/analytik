@@ -12,6 +12,15 @@ export default function ExperimentsPage() {
     if (stored) setExperiments(JSON.parse(stored));
   }, []);
 
+  function deleteExperiment(e: React.MouseEvent, id: string) {
+    e.preventDefault();
+    e.stopPropagation();
+    const updated = experiments.filter((exp) => exp.id !== id);
+    setExperiments(updated);
+    localStorage.setItem("analytik-experiments", JSON.stringify(updated));
+    localStorage.removeItem(`analytik-chat-${id}`);
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -25,17 +34,50 @@ export default function ExperimentsPage() {
       </div>
 
       {experiments.length === 0 ? (
-        <p className="text-gray-500">No experiments yet.</p>
+        <div className="text-center py-16 space-y-4">
+          <p className="text-gray-500 text-lg">No experiments yet.</p>
+          <p className="text-gray-600 text-sm">
+            Upload a CSV or JSON file to get AI-powered analysis and
+            visualizations.
+          </p>
+          <Link
+            href="/experiments/new"
+            className="inline-block bg-white text-black px-6 py-3 rounded-lg text-sm font-medium hover:bg-gray-200"
+          >
+            Upload your first experiment
+          </Link>
+        </div>
       ) : (
         <ul className="space-y-3">
           {experiments.map((exp) => (
             <li key={exp.id}>
               <Link
                 href={`/experiments/${exp.id}`}
-                className="block border border-gray-800 rounded-lg p-4 hover:border-gray-600"
+                className="block border border-gray-800 rounded-lg p-4 hover:border-gray-600 group"
               >
-                <p className="font-medium">{exp.name}</p>
-                <p className="text-sm text-gray-500">{exp.createdAt}</p>
+                <div className="flex items-start justify-between">
+                  <div className="space-y-1">
+                    <p className="font-medium">{exp.name}</p>
+                    <p className="text-sm text-gray-500">
+                      {new Date(exp.createdAt).toLocaleString("en-US", {
+                        year: "numeric",
+                        month: "short",
+                        day: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                    </p>
+                    <p className="text-sm text-gray-600 line-clamp-2">
+                      {exp.analysis.replace(/#{1,3}\s/g, "").slice(0, 120)}...
+                    </p>
+                  </div>
+                  <button
+                    onClick={(e) => deleteExperiment(e, exp.id)}
+                    className="text-gray-600 hover:text-red-400 text-sm opacity-0 group-hover:opacity-100 transition-opacity"
+                  >
+                    Delete
+                  </button>
+                </div>
               </Link>
             </li>
           ))}
