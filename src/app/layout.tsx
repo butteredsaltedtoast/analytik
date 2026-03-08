@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import Link from "next/link";
+import { Navigation } from "@/components/Navigation";
 import "./globals.css";
 
 const geistSans = localFont({
@@ -11,7 +12,7 @@ const geistSans = localFont({
 
 export const metadata: Metadata = {
   title: "Analytik",
-  description: "AI research infrastructure — surface the invisible architecture in your data",
+  description: "An AI research infrastructure platform that helps labs analyze experimental data, learn from past results, catch hidden problems, and propose smarter next experiments.",
 };
 
 export default function RootLayout({
@@ -22,15 +23,15 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${geistSans.variable} font-sans antialiased`}>
-        <nav className="border-b border-gray-800 px-6 py-4 flex items-center gap-6">
-          <Link href="/" className="text-lg font-bold tracking-tight">
-            Analytik
+        <Navigation />
+        <main className="max-w-5xl mx-auto px-6 py-8">
+          {children}
+        </main>
+        <footer className="fixed bottom-4 right-4 text-xs text-gray-500">
+          <Link href="/license" className="hover:text-gray-300">
+            © Omar Aziza, Roma Joshi, Nicholas Maryniy
           </Link>
-          <Link href="/experiments" className="text-sm text-gray-400 hover:text-white">
-            Experiments
-          </Link>
-        </nav>
-        <main className="max-w-5xl mx-auto px-6 py-8">{children}</main>
+        </footer>
       </body>
     </html>
   );
