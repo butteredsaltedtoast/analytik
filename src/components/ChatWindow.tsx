@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useLayoutEffect } from "react";
 import { ChatMessage } from "@/lib/types";
 
 export default function ChatWindow({
@@ -15,6 +15,7 @@ export default function ChatWindow({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
 
   // Load chat history from localStorage
   useEffect(() => {
@@ -38,10 +39,13 @@ export default function ChatWindow({
     }
   }, [messages, experimentId]);
 
-  // Auto-scroll to bottom
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, loading]);
+  // Auto-scroll to bottom when new messages are added
+  useLayoutEffect(() => {
+    const container = messagesContainerRef.current;
+    if (container) {
+      container.scrollTo({ top: container.scrollHeight, behavior: "smooth" });
+    }
+  }, [messages]);
 
   async function sendMessage() {
     if (!input.trim() || loading) return;
@@ -89,7 +93,7 @@ export default function ChatWindow({
   }
 
   return (
-    <div className="border border-gray-800 rounded-lg p-6 flex flex-col h-[500px]">
+    <div className="border border-gray-800 rounded-lg p-6 flex flex-col max-h-[calc(100vh-280px)]">
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-semibold">Chat with your experiment</h2>
@@ -104,7 +108,10 @@ export default function ChatWindow({
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto space-y-3 mb-4">
+      <div
+        ref={messagesContainerRef}
+        className="flex-1 overflow-y-auto space-y-3 mb-4 pr-2"
+      >
         {messages.length === 0 && !loading && (
           <p className="text-gray-600 text-sm text-center py-8">
             Ask a question about your experiment data.
