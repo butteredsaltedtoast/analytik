@@ -9,7 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@google/genai": "^1.44.0",
+    "groq-sdk": "^0.20.0",
     "@tailwindcss/typography": "^0.5.19",
     "framer-motion": "^11.0.3",
     "next": "14.2.35",

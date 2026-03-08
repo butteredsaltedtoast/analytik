@@ -1,20 +1,20 @@
-import { GoogleGenAI } from "@google/genai";
+import Groq from "groq-sdk";
 
 function getClient() {
-  if (!process.env.GEMINI_API_KEY) {
-    throw new Error("GEMINI_API_KEY environment variable is not set");
+  if (!process.env.GROQ_API_KEY) {
+    throw new Error("GROQ_API_KEY environment variable is not set");
   }
-  return new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+  return new Groq({ apiKey: process.env.GROQ_API_KEY });
 }
 
 export async function analyzeExperiment(fileContent: string): Promise<string> {
 
-  const response = await getClient().models.generateContent({
-    model: "gemini-2.0-flash",
-    contents: fileContent,
-    config: {
-
-      systemInstruction: `You are a senior research scientist analyzing experimental data.
+  const response = await getClient().chat.completions.create({
+    model: "llama-3.3-70b-versatile",
+    messages: [
+      {
+        role: "system",
+        content: `You are a senior research scientist analyzing experimental data.
 
 Analyze the provided data thoroughly and respond with EXACTLY these four markdown sections:
 
@@ -30,45 +30,43 @@ Identify anomalies, outliers, potential measurement errors, missing data concern
 ## Proposed Next Experiments
 Based on the findings and problems identified, suggest 1-3 specific follow-up experiments. Each should include what variable to change, what range to test, and what hypothesis it would test.
 
-Be precise. Use numbers from the data. Do not be vague or generic.
-`
-
-    },
+Be precise. Use numbers from the data. Do not be vague or generic.`
+      },
+      {
+        role: "user",
+        content: fileContent,
+      },
+    ],
   });
 
-  return  response.text ?? "";
+  return response.choices[0]?.message?.content ?? "";
 
 }
 
 export async function chatWithExperiment(
-    messages: { role: string; content: string }[],
+  messages: { role: string; content: string }[],
   experimentContext: string
 ): Promise<string> {
 
-    const history = messages.slice(0, -1).map((msg) => ({
-    role: msg.role === "assistant" ? "model" : "user",
-    parts: [{ text: msg.content }],
-  }));
-
-  const lastMessage = messages[messages.length - 1];
-
-  const chat = await getClient().chats.create({
-    model: "gemini-2.0-flash",
-    history: history,
-    config: {
-      systemInstruction: `You are an AI lab partner helping a researcher understand their experimental data.
+  const response = await getClient().chat.completions.create({
+    model: "llama-3.3-70b-versatile",
+    messages: [
+      {
+        role: "system",
+        content: `You are an AI lab partner helping a researcher understand their experimental data.
 
 Here is the experiment data:
 ${experimentContext}
 
 Help the researcher interpret results, suggest explanations, identify patterns, and think through implications. Be conversational but precise. Reference specific numbers from the data when relevant. If the researcher asks about something not in the data, say so clearly.`,
-    },
+      },
+      ...messages.map((msg) => ({
+        role: msg.role as "user" | "assistant",
+        content: msg.content,
+      })),
+    ],
   });
 
-  const response = await chat.sendMessage({
-    message: lastMessage.content,
-  });
-
-  return response.text ?? "";
+  return response.choices[0]?.message?.content ?? "";
 
 }
