@@ -1,14 +1,15 @@
 import { GoogleGenAI } from "@google/genai";
 
-if(!process.env.GEMINI_API_KEY) {
-  throw new Error("Gemini API key not set");
+function getClient() {
+  if (!process.env.GEMINI_API_KEY) {
+    throw new Error("GEMINI_API_KEY environment variable is not set");
+  }
+  return new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 }
-
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 export async function analyzeExperiment(fileContent: string): Promise<string> {
 
-  const response = await ai.models.generateContent({
+  const response = await getClient().models.generateContent({
     model: "gemini-2.0-flash",
     contents: fileContent,
     config: {
@@ -51,7 +52,7 @@ export async function chatWithExperiment(
 
   const lastMessage = messages[messages.length - 1];
 
-  const chat = await ai.chats.create({
+  const chat = await getClient().chats.create({
     model: "gemini-2.0-flash",
     history: history,
     config: {
