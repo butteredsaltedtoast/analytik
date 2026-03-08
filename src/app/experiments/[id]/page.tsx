@@ -30,8 +30,12 @@ export default function ExperimentPage() {
   useEffect(() => {
     const stored = localStorage.getItem("analytik-experiments");
     if (stored) {
+      try {
       const experiments: Experiment[] = JSON.parse(stored);
       setExperiment(experiments.find((e) => e.id === id) ?? null);
+      } catch {
+        localStorage.removeItem("analytik-experiments");
+      }
     }
     setLoaded(true);
   }, [id]);
@@ -77,14 +81,14 @@ export default function ExperimentPage() {
           </p>
         </div>
         <Link href="/experiments">
-          <motion.a
+          <motion.span
             className="text-sm text-gray-500 hover:text-gray-300"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             transition={{ duration: 0.1 }}
           >
             All experiments
-          </motion.a>
+          </motion.span>
         </Link>
       </div>
 
@@ -143,7 +147,7 @@ export default function ExperimentPage() {
           >
             <ChatWindow
               experimentId={experiment.id}
-              experimentContext={experiment.fileContent}
+              experimentContext={`DATA:\n${experiment.fileContent}\n\nANALYSIS:\n${experiment.analysis}`}
             />
           </motion.div>
         )}

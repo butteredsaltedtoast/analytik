@@ -238,7 +238,12 @@ def main():
         charts.append(make_line_graph(data, numeric_cols[0], numeric_cols[1:]))
     
     if categorical_cols and numeric_cols:
-        charts.append(make_line_graph(data, categorical_cols[0], numeric_cols[:3]))
+        x_vals = [row[categorical_cols[0]] for row in data]
+        try:
+            [float(v) for v in x_vals]
+            charts.append(make_line_graph(data, categorical_cols[0], numeric_cols[:3]))
+        except(ValueError, TypeError):
+            pass
     
     if len(numeric_cols) >= 2:
         charts.append(make_scatter_with_regression(data, numeric_cols[0], numeric_cols[1]))
@@ -258,4 +263,13 @@ def main():
     print(json.dumps({"charts": charts, "stats": stats}))
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception as e:
+        import traceback
+        print(json.dumps({
+            "error": str(e),
+            "charts": [],
+            "stats": {}
+        }))
+        sys.exit(0)

@@ -37,40 +37,40 @@ export default function FileUpload() {
       });
 
       // 2. POST to /api/analyze
-      // const res = await fetch("/api/analyze", {
-      //   method: "POST",
-      //   headers: { "Content-Type": "application/json" },
-      //   body: JSON.stringify({ fileContent: text, fileName: file.name }),
-      // });
+      const res = await fetch("/api/analyze", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ fileContent: text, fileName: file.name }),
+      });
 
-      // if (!res.ok) {
-      //   const errData = await res.json();
-      //   throw new Error(errData.error || "Analysis failed");
-      // }
+      if (!res.ok) {
+        const errData = await res.json();
+        throw new Error(errData.error || "Analysis failed");
+      }
 
-      // const { analysis } = await res.json();
+      const { analysis } = await res.json();
 
       // STUB — remove when backend is ready
-    await new Promise((r) => setTimeout(r, 1500)); // fake delay
+    // await new Promise((r) => setTimeout(r, 1500)); // fake delay
 
-      const analysis = `
-      ## Key Findings
-      - Temperature and yield show an inverse relationship above 30°C
-      - Peak yield of 92% occurs at 30°C and 1.5 atm
+    //   const analysis = `
+    //   ## Key Findings
+    //   - Temperature and yield show an inverse relationship above 30°C
+    //   - Peak yield of 92% occurs at 30°C and 1.5 atm
 
-      ## Invisible Architecture
-      - Pressure and temperature are linearly correlated in this dataset (r=0.99)
-      - The yield curve suggests a reaction optimum near 28-32°C
+    //   ## Invisible Architecture
+    //   - Pressure and temperature are linearly correlated in this dataset (r=0.99)
+    //   - The yield curve suggests a reaction optimum near 28-32°C
 
-      ## Hidden Problems
-      - Only 4 data points — insufficient for statistical significance
-      - No replicate measurements to assess reproducibility
-      - Pressure and temperature are confounded — cannot isolate effects
+    //   ## Hidden Problems
+    //   - Only 4 data points — insufficient for statistical significance
+    //   - No replicate measurements to assess reproducibility
+    //   - Pressure and temperature are confounded — cannot isolate effects
 
-      ## Proposed Next Experiments
-      - Hold temperature at 30°C and vary pressure from 0.5 to 3.0 atm
-      - Add replicates (n=3) at each condition
-      - Test temperatures 28, 29, 30, 31, 32°C at fixed pressure`;
+    //   ## Proposed Next Experiments
+    //   - Hold temperature at 30°C and vary pressure from 0.5 to 3.0 atm
+    //   - Add replicates (n=3) at each condition
+    //   - Test temperatures 28, 29, 30, 31, 32°C at fixed pressure`;
 
       
 

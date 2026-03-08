@@ -9,8 +9,14 @@ export default function ExperimentsPage() {
 
   useEffect(() => {
     const stored = localStorage.getItem("analytik-experiments");
+    try
+    {
     if (stored) setExperiments(JSON.parse(stored));
-  }, []);
+    }
+    catch {
+      localStorage.removeItem("analytik-experiments");
+    }
+    }, []);
 
   function deleteExperiment(e: React.MouseEvent, id: string) {
     e.preventDefault();

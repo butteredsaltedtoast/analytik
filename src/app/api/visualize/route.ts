@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
         const result = await new Promise((resolve, reject) => {
 
             const proc = execFile(
-                "python3",
+                process.platform === "win32" ? "python" : "python3",
                 [scriptPath],
                 { maxBuffer: 50 * 1024 * 1024, timeout: 30000 },
                 (error, stdout, stderr) => {

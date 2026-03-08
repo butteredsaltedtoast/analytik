@@ -1,6 +1,10 @@
 import { GoogleGenAI } from "@google/genai";
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY! });
+if(!process.env.GEMINI_API_KEY) {
+  throw new Error("Gemini API key not set");
+}
+
+const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 export async function analyzeExperiment(fileContent: string): Promise<string> {
 
@@ -47,7 +51,7 @@ export async function chatWithExperiment(
 
   const lastMessage = messages[messages.length - 1];
 
-  const chat = ai.chats.create({
+  const chat = await ai.chats.create({
     model: "gemini-2.0-flash",
     history: history,
     config: {

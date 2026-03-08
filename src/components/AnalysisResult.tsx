@@ -1,4 +1,6 @@
+"use client";
 import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 export default function AnalysisResult({ analysis }: { analysis: string }) {
   if (!analysis || analysis === "Analysis not implemented yet.") {
@@ -19,7 +21,7 @@ export default function AnalysisResult({ analysis }: { analysis: string }) {
         prose-strong:text-white
         prose-ul:space-y-1
       ">
-        <ReactMarkdown>{analysis}</ReactMarkdown>
+        <ReactMarkdown remarkPlugins={[remarkGfm]}>{analysis}</ReactMarkdown>
       </div>
     </div>
   );

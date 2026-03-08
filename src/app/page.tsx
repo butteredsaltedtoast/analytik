@@ -6,7 +6,7 @@ const AnimatedHomeContent = dynamic(() => import("../components/AnimatedHomeCont
 
 export default function Home() {
   return (
-    <div className="flex flex-col justify-center items-center px-6" style={{ height: 'calc(100vh - 73px)' }}>
+    <div className="flex-1 flex flex-col justify-center items-center px-6">
       <AnimatedHomeContent />
     </div>
   );

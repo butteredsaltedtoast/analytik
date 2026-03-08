@@ -69,7 +69,6 @@ export default function DataViewer({ fileContent, fileName }: DataViewerProps) {
   const [stats, setStats] = useState<Record<string, ColumnStats>>({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
   // Fetch charts from backend on mount
   useEffect(() => {
     if (!fileContent || data.length === 0) return;
@@ -78,14 +77,18 @@ export default function DataViewer({ fileContent, fileName }: DataViewerProps) {
 
     (async () => {
       try {
-        // STUB — replace with fetch when backend is ready
-        await new Promise((r) => setTimeout(r, 1000));
-        setStats({
-          temperature: { n: 5, mean: 33.0, std: 7.91, min: 25, q25: 30, median: 35, q75: 40, max: 45 },
-          pressure: { n: 5, mean: 1.9, std: 0.79, min: 1.0, q25: 1.5, median: 2.0, q75: 2.5, max: 3.0 },
-          yield: { n: 5, mean: 74.2, std: 15.56, min: 51, q25: 65, median: 78, q75: 85, max: 92 },
+        const res = await fetch("/api/visualize", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ fileContent, fileName }),
         });
-        setCharts([]);
+        if (!res.ok) {
+          const err = await res.json();
+          throw new Error(err.error || "Visualization failed");
+        }
+        const result = await res.json();
+        setCharts(result.charts || []);
+        setStats(result.stats || {});
       } catch (err) {
         setError(err instanceof Error ? err.message : "Visualization failed");
       } finally {
@@ -93,6 +96,7 @@ export default function DataViewer({ fileContent, fileName }: DataViewerProps) {
       }
     })();
   }, [fileContent, fileName, data.length]);
+
 
   if (data.length === 0) {
     return (

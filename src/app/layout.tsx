@@ -22,9 +22,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} font-sans antialiased`}>
+      <body className={`${geistSans.variable} font-sans antialiased min-h-screen flex flex-col`}>
         <Navigation />
-        <main className="max-w-5xl mx-auto px-6 py-8">
+        <main className="flex flex-col flex-1 max-w-5xl mx-auto px-6 py-8">
           {children}
         </main>
         <footer className="fixed bottom-4 right-4 text-xs text-gray-500">

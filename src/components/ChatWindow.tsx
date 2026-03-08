@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useLayoutEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { ChatMessage } from "@/lib/types";
 
 export default function ChatWindow({
@@ -40,7 +40,7 @@ export default function ChatWindow({
   }, [messages, experimentId]);
 
   // Auto-scroll to bottom when new messages are added
-  useLayoutEffect(() => {
+  useEffect(() => {
     const container = messagesContainerRef.current;
     if (container) {
       container.scrollTo({ top: container.scrollHeight, behavior: "smooth" });
@@ -69,8 +69,15 @@ export default function ChatWindow({
       });
 
       if (!res.ok) {
-        const errData = await res.json();
-        throw new Error(errData.error || "Chat request failed");
+
+        let errorMsg = "Chat request failed";
+        try {
+          const errData = await res.json();
+          errorMsg = errData.error || errorMsg;
+        } catch {}
+
+        throw new Error(errorMsg);
+
       }
 
       const { response } = await res.json();
