@@ -3,45 +3,43 @@ import { chatWithExperiment } from "@/lib/gemini";
 
 export async function POST(req: NextRequest) {
   try {
+    const apiKey = req.headers.get("x-gemini-key");
+    if (!apiKey) return NextResponse.json({ error: "Missing Gemini API key." }, { status: 401 });
+    const body = await req.json();
+    const messages = body.messages;
+    const experimentContext: string = body.experimentContext;
 
-  const body = await req.json();
-  const messages = body.messages;
-  const experimentContext: string = body.experimentContext;
+    if (!Array.isArray(messages) || messages.length === 0) {
 
-  if(!Array.isArray(messages) || messages.length === 0)
-  {
+      return NextResponse.json(
+        { error: "messages is required and must be a non-empty array." },
+        { status: 400 },
+      );
 
-    return NextResponse.json(
-      { error: "messages is required and must be a non-empty array." },
-      { status: 400 },
-    );
+    }
+
+    if (!experimentContext || typeof experimentContext !== "string" || experimentContext.trim() === "") {
+
+      return NextResponse.json(
+        { error: "experimentContext is required and must be a non-empty string." },
+        { status: 400 }
+      );
+
+    }
+
+    const response = await chatWithExperiment(messages, experimentContext, apiKey);
+    return NextResponse.json({ response });
 
   }
 
-  if(!experimentContext || typeof experimentContext !== "string" || experimentContext.trim() === "")
-  {
+  catch (error) {
 
+    console.error("Chat error:", error);
     return NextResponse.json(
-      { error: "experimentContext is required and must be a non-empty string."},
-      { status: 400 }
+      { error: "Failed to get chat response. Report this!" },
+      { status: 500 },
     );
 
   }
-
-  const response = await chatWithExperiment(messages, experimentContext);
-  return NextResponse.json({ response });
-
-}
-
-catch(error)
-{
-
-  console.error("Chat error:", error);
-  return NextResponse.json(
-    { error: "Failed to get chat response. Report this!"},
-    { status: 500 },
-  ); 
-
-}
 
 }

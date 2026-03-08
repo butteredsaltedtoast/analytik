@@ -1,15 +1,11 @@
 import { GoogleGenAI } from "@google/genai";
 
-function getClient() {
-  if (!process.env.GEMINI_API_KEY) {
-    throw new Error("GEMINI_API_KEY environment variable is not set");
-  }
-  return new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+function getClient(apiKey: string) {
+  return new GoogleGenAI({ apiKey });
 }
 
-export async function analyzeExperiment(fileContent: string): Promise<string> {
-
-  const response = await getClient().models.generateContent({
+export async function analyzeExperiment(fileContent: string, apiKey: string): Promise<string> {
+  const response = await getClient(apiKey).models.generateContent({
     model: "gemini-2.0-flash",
     contents: fileContent,
     config: {
@@ -36,24 +32,25 @@ Be precise. Use numbers from the data. Do not be vague or generic.
     },
   });
 
-  return  response.text ?? "";
+  return response.text ?? "";
 
 }
 
 export async function chatWithExperiment(
-    messages: { role: string; content: string }[],
-  experimentContext: string
+  messages: Array<{ role: string; content: string }>,
+  experimentContext: string,
+  apiKey: string
 ): Promise<string> {
 
-    const history = messages.slice(0, -1).map((msg) => ({
+  const history = messages.slice(0, -1).map((msg) => ({
     role: msg.role === "assistant" ? "model" : "user",
     parts: [{ text: msg.content }],
   }));
 
   const lastMessage = messages[messages.length - 1];
 
-  const chat = await getClient().chats.create({
-    model: "gemini-2.0-flash",
+  const chat = await getClient(apiKey).chats.create({
+    model: "gemini-1.5-flash",
     history: history,
     config: {
       systemInstruction: `You are an AI lab partner helping a researcher understand their experimental data.

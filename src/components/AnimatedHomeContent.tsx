@@ -3,12 +3,19 @@
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
-
 import upload from "../assets/upload.png";
 import ai from "../assets/ai.png";
 import chat from "../assets/chat.png";
+import { useRouter } from "next/navigation";
+import { useApiKey } from "@/context/ApiKeyContext";
 
 export default function AnimatedHomeContent() {
+  const router = useRouter();
+  const { isSignedIn, showModal } = useApiKey();
+  function gatedPush(href: string) {
+    if (isSignedIn) router.push(href);
+    else showModal();
+  }
   return (
     <motion.div
       className="w-full max-w-5xl space-y-4"
@@ -28,12 +35,12 @@ export default function AnimatedHomeContent() {
           with publication-quality charts.
         </p>
         <div className="flex gap-4 items-center pt-4 pb-6">
-          <Link href="/experiments/new" className="inline-block bg-white text-black px-4 py-2 md:px-6 md:py-3 rounded-lg font-medium hover:bg-gray-200 text-sm md:text-base">
+          <button onClick={() => gatedPush("/experiments/new")} className="inline-block bg-white text-black px-4 py-2 md:px-6 md:py-3 rounded-lg font-medium hover:bg-gray-200 text-sm md:text-base transition-colors">
             Upload New Experiment
-          </Link>
-          <Link href="/experiments" className="text-gray-400 hover:text-white text-sm md:text-base">
+          </button>
+          <button onClick={() => gatedPush("/experiments")} className="text-gray-400 hover:text-white text-sm md:text-base transition-colors">
             View Old Experiments
-          </Link>
+          </button>
         </div>
       </div>
 

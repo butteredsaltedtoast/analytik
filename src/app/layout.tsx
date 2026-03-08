@@ -3,6 +3,8 @@ import localFont from "next/font/local";
 import Link from "next/link";
 import { Navigation } from "@/components/Navigation";
 import "./globals.css";
+import { ApiKeyProvider } from "@/context/ApiKeyContext";
+import { ApiKeyModal } from "@/components/ApiKeyModal";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -23,15 +25,18 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${geistSans.variable} font-sans antialiased min-h-screen flex flex-col`}>
-        <Navigation />
-        <main className="flex flex-col flex-1 max-w-5xl mx-auto px-6 py-8">
-          {children}
-        </main>
-        <footer className="fixed bottom-4 right-4 text-xs text-gray-500">
-          <Link href="/license" className="hover:text-gray-300">
-            © Omar Aziza, Roma Joshi, Nicholas Maryniy
-          </Link>
-        </footer>
+        <ApiKeyProvider>
+          <Navigation />
+          <main className="flex flex-col flex-1 max-w-5xl mx-auto px-6 py-8">
+            {children}
+          </main>
+          <ApiKeyModal />
+          <footer className="fixed bottom-4 right-4 text-xs text-gray-500">
+            <Link href="/license" className="hover:text-gray-300">
+              © Omar Aziza, Roma Joshi, Nicholas Maryniy
+            </Link>
+          </footer>
+        </ApiKeyProvider>
       </body>
     </html>
   );

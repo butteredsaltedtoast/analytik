@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { ChatMessage } from "@/lib/types";
+import { useApiKey } from "@/context/ApiKeyContext";
 
 export default function ChatWindow({
   experimentId,
@@ -16,6 +17,7 @@ export default function ChatWindow({
   const [error, setError] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
+  const { apiKey } = useApiKey();
 
   // Load chat history from localStorage
   useEffect(() => {
@@ -61,7 +63,10 @@ export default function ChatWindow({
     try {
       const res = await fetch("/api/chat", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "x-gemini-key": apiKey ?? "",
+        },
         body: JSON.stringify({
           messages: updatedMessages,
           experimentContext: experimentContext,
@@ -74,7 +79,7 @@ export default function ChatWindow({
         try {
           const errData = await res.json();
           errorMsg = errData.error || errorMsg;
-        } catch {}
+        } catch { }
 
         throw new Error(errorMsg);
 
@@ -133,8 +138,8 @@ export default function ChatWindow({
           >
             <div
               className={`max-w-[80%] rounded-lg px-3 py-2 text-sm whitespace-pre-wrap ${msg.role === "user"
-                  ? "bg-blue-600 text-white"
-                  : "bg-gray-800 text-gray-300"
+                ? "bg-blue-600 text-white"
+                : "bg-gray-800 text-gray-300"
                 }`}
             >
               {msg.content}

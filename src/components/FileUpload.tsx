@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useApiKey } from "@/context/ApiKeyContext";
 
 export default function FileUpload() {
   const router = useRouter();
@@ -9,6 +10,7 @@ export default function FileUpload() {
   const [error, setError] = useState<string | null>(null);
 
   async function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
+    const { apiKey } = useApiKey();
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -39,7 +41,10 @@ export default function FileUpload() {
       // 2. POST to /api/analyze
       const res = await fetch("/api/analyze", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "x-gemini-key": apiKey ?? "",
+        },
         body: JSON.stringify({ fileContent: text, fileName: file.name }),
       });
 
@@ -49,30 +54,6 @@ export default function FileUpload() {
       }
 
       const { analysis } = await res.json();
-
-      // STUB — remove when backend is ready
-    // await new Promise((r) => setTimeout(r, 1500)); // fake delay
-
-    //   const analysis = `
-    //   ## Key Findings
-    //   - Temperature and yield show an inverse relationship above 30°C
-    //   - Peak yield of 92% occurs at 30°C and 1.5 atm
-
-    //   ## Invisible Architecture
-    //   - Pressure and temperature are linearly correlated in this dataset (r=0.99)
-    //   - The yield curve suggests a reaction optimum near 28-32°C
-
-    //   ## Hidden Problems
-    //   - Only 4 data points — insufficient for statistical significance
-    //   - No replicate measurements to assess reproducibility
-    //   - Pressure and temperature are confounded — cannot isolate effects
-
-    //   ## Proposed Next Experiments
-    //   - Hold temperature at 30°C and vary pressure from 0.5 to 3.0 atm
-    //   - Add replicates (n=3) at each condition
-    //   - Test temperatures 28, 29, 30, 31, 32°C at fixed pressure`;
-
-      
 
       // 3. Save to localStorage
       const experiment = {
@@ -109,11 +90,10 @@ export default function FileUpload() {
       />
       <label
         htmlFor="file-input"
-        className={`cursor-pointer block ${
-          uploading
-            ? "text-gray-500 cursor-not-allowed"
-            : "text-gray-400 hover:text-white"
-        }`}
+        className={`cursor-pointer block ${uploading
+          ? "text-gray-500 cursor-not-allowed"
+          : "text-gray-400 hover:text-white"
+          }`}
       >
         {uploading ? (
           <span className="flex items-center justify-center gap-2">
