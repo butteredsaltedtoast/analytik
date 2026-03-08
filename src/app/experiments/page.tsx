@@ -3,9 +3,13 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Experiment } from "@/lib/types";
+import { useRouter } from "next/navigation";
+import { useApiKey } from "@/context/ApiKeyContext";
 
 export default function ExperimentsPage() {
   const [experiments, setExperiments] = useState<Experiment[]>([]);
+  const router = useRouter();
+  const { requireAuth } = useApiKey();
 
   useEffect(() => {
     const stored = localStorage.getItem("analytik-experiments");
@@ -28,11 +32,17 @@ export default function ExperimentsPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="max-w-5xl mx-auto w-full">
+      <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Experiments</h1>
         <Link
           href="/experiments/new"
+          onClick={(e) => {
+            if (!requireAuth(() => router.push("/experiments/new"))) {
+              e.preventDefault();
+            }
+          }}
           className="bg-white text-black px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-200"
         >
           + New
@@ -48,6 +58,11 @@ export default function ExperimentsPage() {
           </p>
           <Link
             href="/experiments/new"
+            onClick={(e) => {
+              if (!requireAuth(() => router.push("/experiments/new"))) {
+                e.preventDefault();
+              }
+            }}
             className="inline-block bg-white text-black px-6 py-3 rounded-lg text-sm font-medium hover:bg-gray-200"
           >
             Upload your first experiment
@@ -89,6 +104,7 @@ export default function ExperimentsPage() {
           ))}
         </ul>
       )}
+      </div>
     </div>
   );
 }

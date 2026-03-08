@@ -9,7 +9,7 @@ export default function LicensePage() {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
       transition={{ duration: 0.5 }}
-      className="max-w-4xl mx-auto px-6 py-8"
+      className="max-w-5xl mx-auto w-full px-6 py-8"
     >
       <h1 className="text-2xl font-bold mb-6">License</h1>
       <pre className="text-sm text-gray-300 whitespace-pre-wrap">

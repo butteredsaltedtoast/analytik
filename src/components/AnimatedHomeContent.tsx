@@ -3,12 +3,22 @@
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
+import { useRouter } from "next/navigation";
+import { useApiKey } from "../context/ApiKeyContext";
 
 import upload from "../assets/upload.png";
 import ai from "../assets/ai.png";
 import chat from "../assets/chat.png";
 
 export default function AnimatedHomeContent() {
+  const router = useRouter();
+  const { apiKey, requireAuth } = useApiKey();
+
+  const handleLinkClick = (href: string) => (e: React.MouseEvent) => {
+    if (!requireAuth(() => router.push(href))) {
+      e.preventDefault();
+    }
+  };
   return (
     <motion.div
       className="w-full max-w-5xl space-y-4"
@@ -27,7 +37,7 @@ export default function AnimatedHomeContent() {
           with publication-quality charts.
         </p>
         <div className="flex gap-4 items-center pt-4 pb-6">
-          <Link href="/experiments/new" className="inline-block bg-white text-black px-4 py-2 md:px-6 md:py-3 rounded-lg font-medium hover:bg-gray-200 text-sm md:text-base">
+          <Link href="/experiments/new" onClick={handleLinkClick("/experiments/new")} className="inline-block bg-white text-black px-4 py-2 md:px-6 md:py-3 rounded-lg font-medium hover:bg-gray-200 text-sm md:text-base">
             Upload New Experiment
           </Link>
           <Link href="/experiments" className="text-gray-400 hover:text-white text-sm md:text-base">

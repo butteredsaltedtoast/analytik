@@ -229,11 +229,17 @@ def main():
 
     numeric_cols, categorical_cols = get_columns(data)
     stats = compute_stats(data, numeric_cols)
+    
+    print(f"Detected {len(numeric_cols)} numeric columns: {numeric_cols}", file=sys.stderr)
+    print(f"Detected {len(categorical_cols)} categorical columns: {categorical_cols}", file=sys.stderr)
 
     charts = []
 
     if len(numeric_cols) >= 2:
-        charts.append(make_line_graph(data, numeric_cols[0], numeric_cols[1:]))
+        try:
+            charts.append(make_line_graph(data, numeric_cols[0], numeric_cols[1:]))
+        except Exception as e:
+            print(f"Line graph error: {e}", file=sys.stderr)
 
     if categorical_cols and numeric_cols:
         x_vals = [row[categorical_cols[0]] for row in data]
@@ -244,20 +250,35 @@ def main():
             pass
 
     if len(numeric_cols) >= 2:
-        charts.append(make_scatter_with_regression(data, numeric_cols[0], numeric_cols[1]))
+        try:
+            charts.append(make_scatter_with_regression(data, numeric_cols[0], numeric_cols[1]))
+        except Exception as e:
+            print(f"Scatter plot error: {e}", file=sys.stderr)
 
     for col in numeric_cols[:4]:
-        charts.append(make_distribution(data, col))
+        try:
+            charts.append(make_distribution(data, col))
+        except Exception as e:
+            print(f"Distribution error for {col}: {e}", file=sys.stderr)
 
-    corr = make_correlation_matrix(data, numeric_cols)
-    if corr:
-        charts.append(corr)
+    try:
+        corr = make_correlation_matrix(data, numeric_cols)
+        if corr:
+            charts.append(corr)
+    except Exception as e:
+        print(f"Correlation matrix error: {e}", file=sys.stderr)
 
-    pairwise = make_pairwise_scatter(data, numeric_cols)
-    if pairwise:
-        charts.append(pairwise)
+    try:
+        pairwise = make_pairwise_scatter(data, numeric_cols)
+        if pairwise:
+            charts.append(pairwise)
+    except Exception as e:
+        print(f"Pairwise scatter error: {e}", file=sys.stderr)
 
     charts = [c for c in charts if c is not None]
+    
+    print(f"Generated {len(charts)} charts for {len(numeric_cols)} numeric columns", file=sys.stderr)
+    
     print(json.dumps({"charts": charts, "stats": stats}))
 
 if __name__ == "__main__":

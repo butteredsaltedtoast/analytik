@@ -31,8 +31,8 @@ export default function ExperimentPage() {
     const stored = localStorage.getItem("analytik-experiments");
     if (stored) {
       try {
-      const experiments: Experiment[] = JSON.parse(stored);
-      setExperiment(experiments.find((e) => e.id === id) ?? null);
+        const experiments: Experiment[] = JSON.parse(stored);
+        setExperiment(experiments.find((e) => e.id === id) ?? null);
       } catch {
         localStorage.removeItem("analytik-experiments");
       }
@@ -60,7 +60,7 @@ export default function ExperimentPage() {
 
   return (
     <motion.div
-      className="space-y-6"
+      className="space-y-6 w-full"
       initial={{ opacity: 0, scale: 0.9, y: 20 }}
       animate={{ opacity: 1, scale: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.9, y: 20 }}
@@ -91,7 +91,7 @@ export default function ExperimentPage() {
         </Link>
       </div>
 
-      <div className="flex gap-1 border-b border-gray-800">
+      <div className="flex justify-center gap-1 border-b border-gray-800">
         {(["data", "analysis", "chat"] as const).map((tab) => (
           <button
             key={tab}

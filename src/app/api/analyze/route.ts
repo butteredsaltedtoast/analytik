@@ -7,6 +7,7 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const fileContent: string = body.fileContent;
     const fileName: string = body.fileName;
+    const methodsContent: string | undefined = body.methodsContent;
 
     if (!fileContent || typeof fileContent !== "string" || fileContent.trim() === "") {
       return NextResponse.json(
@@ -22,7 +23,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const analysis = await analyzeExperiment(fileContent, apiKey);
+    const analysis = await analyzeExperiment(fileContent, apiKey, methodsContent);
     return NextResponse.json({ analysis });
   } catch (error) {
     console.error("Analysis error:", error);

@@ -8,13 +8,8 @@ function getClient(apiKey?: string) {
   return new Groq({ apiKey: key });
 }
 
-export async function analyzeExperiment(fileContent: string, apiKey?: string): Promise<string> {
-  const response = await getClient(apiKey).chat.completions.create({
-    model: "llama-3.3-70b-versatile",
-    messages: [
-      {
-        role: "system",
-        content: `You are a senior research scientist analyzing experimental data.
+export async function analyzeExperiment(fileContent: string, apiKey?: string, methodsContent?: string): Promise<string> {
+  const systemPrompt = `You are a senior research scientist analyzing experimental data.
 
 Analyze the provided data thoroughly and respond with EXACTLY these four markdown sections:
 
@@ -30,11 +25,23 @@ Identify anomalies, outliers, potential measurement errors, missing data concern
 ## Proposed Next Experiments
 Based on the findings and problems identified, suggest 1-3 specific follow-up experiments. Each should include what variable to change, what range to test, and what hypothesis it would test.
 
-Be precise. Use numbers from the data. Do not be vague or generic.`
+Be precise. Use numbers from the data. Do not be vague or generic.`;
+
+  let userContent = fileContent;
+  if (methodsContent) {
+    userContent = `EXPERIMENTAL METHODS AND CONTEXT:\n${methodsContent}\n\n---\n\nEXPERIMENTAL DATA:\n${fileContent}`;
+  }
+
+  const response = await getClient(apiKey).chat.completions.create({
+    model: "llama-3.3-70b-versatile",
+    messages: [
+      {
+        role: "system",
+        content: systemPrompt
       },
       {
         role: "user",
-        content: fileContent,
+        content: userContent,
       },
     ],
   });
@@ -56,6 +63,8 @@ export async function chatWithExperiment(
 
 Here is the experiment data:
 ${experimentContext}
+
+This conversation is more casual conversation, but should use researcher-level language and precision. Only respond in approximately 1 to 3 sentences unless absolutely necessary.
 
 Help the researcher interpret results, suggest explanations, identify patterns, and think through implications. Be conversational but precise. Reference specific numbers from the data when relevant. If the researcher asks about something not in the data, say so clearly.`,
       },
