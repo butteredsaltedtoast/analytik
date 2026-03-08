@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 
 interface Chart {
   title: string;
-  image: string; // "data:image/png;base64,..."
+  image: string;
 }
 
 interface ColumnStats {
@@ -23,7 +23,6 @@ interface DataViewerProps {
   fileName: string;
 }
 
-// Parse CSV into array of objects
 function parseCSV(csv: string): Record<string, string | number>[] {
   const lines = csv.trim().split("\n");
   if (lines.length < 2) return [];
@@ -69,7 +68,7 @@ export default function DataViewer({ fileContent, fileName }: DataViewerProps) {
   const [stats, setStats] = useState<Record<string, ColumnStats>>({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  // Fetch charts from backend on mount
+
   useEffect(() => {
     if (!fileContent || data.length === 0) return;
     setLoading(true);
@@ -97,7 +96,6 @@ export default function DataViewer({ fileContent, fileName }: DataViewerProps) {
     })();
   }, [fileContent, fileName, data.length]);
 
-
   if (data.length === 0) {
     return (
       <div className="border border-gray-800 rounded-lg p-6">
@@ -110,7 +108,6 @@ export default function DataViewer({ fileContent, fileName }: DataViewerProps) {
 
   return (
     <div className="space-y-8">
-      {/* ---------- DATA TABLE ---------- */}
       <div className="border border-gray-800 rounded-lg p-6">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold">Raw Data</h2>
@@ -160,7 +157,6 @@ export default function DataViewer({ fileContent, fileName }: DataViewerProps) {
         </div>
       </div>
 
-      {/* ---------- DESCRIPTIVE STATISTICS ---------- */}
       {statCols.length > 0 && (
         <div className="border border-gray-800 rounded-lg p-6">
           <h2 className="text-lg font-semibold mb-4">Descriptive Statistics</h2>
@@ -238,7 +234,6 @@ export default function DataViewer({ fileContent, fileName }: DataViewerProps) {
         </div>
       )}
 
-      {/* ---------- CHARTS ---------- */}
       <div className="border border-gray-800 rounded-lg p-6">
         <h2 className="text-lg font-semibold mb-4">Visualizations</h2>
 

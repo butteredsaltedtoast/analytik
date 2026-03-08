@@ -17,7 +17,6 @@ export default function AnimatedHomeContent() {
       exit={{ opacity: 0, scale: 0.9, y: 20 }}
       transition={{ duration: 0.8, ease: "easeOut" }}
     >
-      {/* Hero */}
       <div className="space-y-2 max-w-3xl -mt-4">
         <h1 className="text-2xl md:text-4xl font-bold leading-tight">
           Your AI lab partner
@@ -37,7 +36,6 @@ export default function AnimatedHomeContent() {
         </div>
       </div>
 
-      {/* Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
         <div className="border border-gray-800 rounded-lg p-3 md:p-4 space-y-1">
           <Image src={upload} alt="Upload" width={50} height={50} />

@@ -11,15 +11,14 @@ import matplotlib.pyplot
 from matplotlib.ticker import MaxNLocator
 
 matplotlib.pyplot.rcParams.update({
-
-    "figure.facecolor": "#030712",    # gray-950
-    "axes.facecolor": "#111827",       # gray-900
-    "axes.edgecolor": "#374151",       # gray-700
-    "axes.labelcolor": "#d1d5db",      # gray-300
+    "figure.facecolor": "#030712",
+    "axes.facecolor": "#111827",
+    "axes.edgecolor": "#374151",
+    "axes.labelcolor": "#d1d5db",
     "text.color": "#d1d5db",
-    "xtick.color": "#9ca3af",          # gray-400
+    "xtick.color": "#9ca3af",
     "ytick.color": "#9ca3af",
-    "grid.color": "#1f2937",           # gray-800
+    "grid.color": "#1f2937",
     "grid.linestyle": "--",
     "grid.alpha": 0.7,
     "legend.facecolor": "#1f2937",
@@ -28,7 +27,6 @@ matplotlib.pyplot.rcParams.update({
     "font.size": 11,
     "axes.titlesize": 13,
     "axes.titleweight": "bold",
-
 })
 
 COLORS = ["#3b82f6", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6", "#ec4899", "#06b6d4", "#84cc16"]
@@ -37,7 +35,7 @@ def parse_input(raw: str, file_name: str) -> list[dict]:
     if file_name.endswith(".json"):
         parsed = json.loads(raw)
         return parsed if isinstance(parsed, list) else [parsed]
-    
+
     reader = csv.DictReader(io.StringIO(raw))
     rows = []
 
@@ -73,15 +71,15 @@ def compute_stats(data: list[dict], numeric_cols: list[str]) -> dict:
     for col in numeric_cols:
         values = numpy.array([row[col] for row in data])
         stats[col] = {
-            "n" : len(values),
-            "mean" : round(float(numpy.mean(values)), 4),
-            "std" : round(float(numpy.std(values, ddof=1)), 4) if len(values) > 1 else 0,
-            "min" : round(float(numpy.min(values)), 4),
-            "q25" : round(float(numpy.percentile(values, 25)), 4),
-            "median" : round(float(numpy.median(values)), 4),
-            "q75" : round(float(numpy.percentile(values, 75)), 4),
-            "max" : round(float(numpy.max(values)), 4),
-        }  
+            "n": len(values),
+            "mean": round(float(numpy.mean(values)), 4),
+            "std": round(float(numpy.std(values, ddof=1)), 4) if len(values) > 1 else 0,
+            "min": round(float(numpy.min(values)), 4),
+            "q25": round(float(numpy.percentile(values, 25)), 4),
+            "median": round(float(numpy.median(values)), 4),
+            "q75": round(float(numpy.percentile(values, 75)), 4),
+            "max": round(float(numpy.max(values)), 4),
+        }
 
     return stats
 
@@ -98,7 +96,7 @@ def make_line_graph(data: list[dict], x_col: str, y_cols: list[str]) -> dict:
 
     for i, y_col in enumerate(y_cols):
         y = [row[y_col] for row in data]
-        ax.plot(x, y, marker="o", markersize = 5, linewidth = 2, color = COLORS[i % len(COLORS)], label=y_col)
+        ax.plot(x, y, marker="o", markersize=5, linewidth=2, color=COLORS[i % len(COLORS)], label=y_col)
 
     ax.set_xlabel(x_col)
 
@@ -111,11 +109,11 @@ def make_line_graph(data: list[dict], x_col: str, y_cols: list[str]) -> dict:
     ax.xaxis.set_major_locator(MaxNLocator(integer=True, nbins=10))
 
     return {"title": f"{", ".join(y_cols)} vs {x_col}", "image": fig_to_b64(fig)}
-    
+
 def make_correlation_matrix(data: list[dict], numeric_cols: list[str]) -> dict | None:
-    if(len(numeric_cols) < 3):
+    if len(numeric_cols) < 3:
         return None
-        
+
     matrix = numpy.array([[row[c] for c in numeric_cols] for row in data])
     corr = numpy.corrcoef(matrix, rowvar=False)
 
@@ -131,12 +129,12 @@ def make_correlation_matrix(data: list[dict], numeric_cols: list[str]) -> dict |
         for j in range(len(numeric_cols)):
             text_color = "white" if abs(corr[i, j]) > 0.5 else "#d1d5db"
             ax.text(j, i, f"{corr[i, j]:.2f}", ha="center", va="center", color=text_color, fontsize=8, fontweight="bold")
-        
+
     fig.colorbar(im, ax=ax, label="Pearson Correlation", shrink=0.8)
     ax.set_title("Correlation Matrix")
 
     return {"title": "Correlation Matrix", "image": fig_to_b64(fig)}
-    
+
 def make_distribution(data: list[dict], col: str) -> dict:
     values = numpy.array([row[col] for row in data])
 
@@ -156,7 +154,7 @@ def make_distribution(data: list[dict], col: str) -> dict:
     ax.legend()
     ax.grid(True, axis="y")
 
-    return {"title" : f"Distribution of {col}", "image": fig_to_b64(fig)}
+    return {"title": f"Distribution of {col}", "image": fig_to_b64(fig)}
 
 def make_scatter_with_regression(data: list[dict], x_col: str, y_col: str) -> dict:
     x = numpy.array([row[x_col] for row in data])
@@ -198,26 +196,26 @@ def make_pairwise_scatter(data: list[dict], numeric_cols: list[str]) -> dict | N
             y_vals = [row[numeric_cols[i]] for row in data]
 
             if i == j:
-                ax.hist(x_vals, bins=min(15, max(4, len(data) // 3)), color = COLORS[j % len(COLORS)], edgecolors = "#1f2937", linewidths=0.3)
+                ax.hist(x_vals, bins=min(15, max(4, len(data) // 3)), color=COLORS[j % len(COLORS)], edgecolors="#1f2937", linewidths=0.3)
             else:
-                ax.scatter(x_vals, y_vals, s=20, alpha=0.7, color = COLORS[j % len(COLORS)], edgecolors = "#1f2937", linewidths=0.3)
-            
+                ax.scatter(x_vals, y_vals, s=20, alpha=0.7, color=COLORS[j % len(COLORS)], edgecolors="#1f2937", linewidths=0.3)
+
             if i == len(numeric_cols) - 1:
                 ax.set_xlabel(numeric_cols[j], fontsize=8)
             else:
                 ax.set_xticklabels([])
-            
+
             if j == 0:
                 ax.set_ylabel(numeric_cols[i], fontsize=8)
             else:
                 ax.set_yticklabels([])
-            
+
             ax.tick_params(labelsize=7)
 
     fig.suptitle("Pairwise Relationships", y=1.02)
     fig.tight_layout()
 
-    return {"title" : "Pairwise Relationships", "image": fig_to_b64(fig)}
+    return {"title": "Pairwise Relationships", "image": fig_to_b64(fig)}
 
 def main():
     raw_input = json.loads(sys.stdin.read())
@@ -226,7 +224,7 @@ def main():
 
     data = parse_input(file_content, file_name)
     if not data:
-        print(json.dumps({"charts" : [], "stats": {}}))
+        print(json.dumps({"charts": [], "stats": {}}))
         return
 
     numeric_cols, categorical_cols = get_columns(data)
@@ -236,29 +234,29 @@ def main():
 
     if len(numeric_cols) >= 2:
         charts.append(make_line_graph(data, numeric_cols[0], numeric_cols[1:]))
-    
+
     if categorical_cols and numeric_cols:
         x_vals = [row[categorical_cols[0]] for row in data]
         try:
             [float(v) for v in x_vals]
             charts.append(make_line_graph(data, categorical_cols[0], numeric_cols[:3]))
-        except(ValueError, TypeError):
+        except (ValueError, TypeError):
             pass
-    
+
     if len(numeric_cols) >= 2:
         charts.append(make_scatter_with_regression(data, numeric_cols[0], numeric_cols[1]))
 
     for col in numeric_cols[:4]:
         charts.append(make_distribution(data, col))
-    
+
     corr = make_correlation_matrix(data, numeric_cols)
     if corr:
         charts.append(corr)
-    
+
     pairwise = make_pairwise_scatter(data, numeric_cols)
     if pairwise:
         charts.append(pairwise)
-    
+
     charts = [c for c in charts if c is not None]
     print(json.dumps({"charts": charts, "stats": stats}))
 

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { ChatMessage } from "@/lib/types";
+import { useApiKey } from "@/context/ApiKeyContext";
 
 export default function ChatWindow({
   experimentId,
@@ -16,20 +17,17 @@ export default function ChatWindow({
   const [error, setError] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
+  const { apiKey } = useApiKey();
 
-  // Load chat history from localStorage
   useEffect(() => {
     const stored = localStorage.getItem(`analytik-chat-${experimentId}`);
     if (stored) {
       try {
         setMessages(JSON.parse(stored));
-      } catch {
-        // corrupted data, ignore
-      }
+      } catch {}
     }
   }, [experimentId]);
 
-  // Save chat history whenever messages change
   useEffect(() => {
     if (messages.length > 0) {
       localStorage.setItem(
@@ -39,7 +37,6 @@ export default function ChatWindow({
     }
   }, [messages, experimentId]);
 
-  // Auto-scroll to bottom when new messages are added
   useEffect(() => {
     const container = messagesContainerRef.current;
     if (container) {
@@ -61,7 +58,10 @@ export default function ChatWindow({
     try {
       const res = await fetch("/api/chat", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...(apiKey ? { "x-api-key": apiKey } : {}),
+        },
         body: JSON.stringify({
           messages: updatedMessages,
           experimentContext: experimentContext,
@@ -69,15 +69,12 @@ export default function ChatWindow({
       });
 
       if (!res.ok) {
-
         let errorMsg = "Chat request failed";
         try {
           const errData = await res.json();
           errorMsg = errData.error || errorMsg;
         } catch {}
-
         throw new Error(errorMsg);
-
       }
 
       const { response } = await res.json();
@@ -101,7 +98,6 @@ export default function ChatWindow({
 
   return (
     <div className="border border-gray-800 rounded-lg p-6 flex flex-col max-h-[calc(100vh-280px)]">
-      {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-semibold">Chat with your experiment</h2>
         {messages.length > 0 && (
@@ -114,7 +110,6 @@ export default function ChatWindow({
         )}
       </div>
 
-      {/* Messages */}
       <div
         ref={messagesContainerRef}
         className="flex-1 overflow-y-auto space-y-3 mb-4 pr-2"
@@ -177,7 +172,6 @@ export default function ChatWindow({
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Input */}
       <div className="flex gap-2">
         <input
           value={input}

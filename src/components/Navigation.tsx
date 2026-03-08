@@ -4,10 +4,12 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { useApiKey } from "@/context/ApiKeyContext";
 import icon from "../assets/icon.png";
 
 export function Navigation() {
   const pathname = usePathname();
+  const { isSignedIn, showModal, clearKey } = useApiKey();
 
   return (
     <motion.nav
@@ -37,6 +39,30 @@ export function Navigation() {
       >
         Experiments
       </Link>
+
+      <div className="ml-auto flex items-center gap-3">
+        {isSignedIn ? (
+          <>
+            <span className="flex items-center gap-1.5 text-xs text-green-400">
+              <span className="w-1.5 h-1.5 rounded-full bg-green-400" />
+              Connected
+            </span>
+            <button
+              onClick={clearKey}
+              className="text-xs text-gray-500 hover:text-gray-300 transition-colors"
+            >
+              Disconnect
+            </button>
+          </>
+        ) : (
+          <button
+            onClick={showModal}
+            className="text-xs bg-gray-800 hover:bg-gray-700 text-gray-300 px-3 py-1.5 rounded-lg transition-colors"
+          >
+            Connect API Key
+          </button>
+        )}
+      </div>
     </motion.nav>
   );
 }

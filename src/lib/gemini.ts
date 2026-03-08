@@ -1,15 +1,15 @@
 import Groq from "groq-sdk";
 
-function getClient() {
-  if (!process.env.GROQ_API_KEY) {
-    throw new Error("GROQ_API_KEY environment variable is not set");
+function getClient(apiKey?: string) {
+  const key = apiKey || process.env.GROQ_API_KEY;
+  if (!key) {
+    throw new Error("No API key provided. Please connect your Groq API key.");
   }
-  return new Groq({ apiKey: process.env.GROQ_API_KEY });
+  return new Groq({ apiKey: key });
 }
 
-export async function analyzeExperiment(fileContent: string): Promise<string> {
-
-  const response = await getClient().chat.completions.create({
+export async function analyzeExperiment(fileContent: string, apiKey?: string): Promise<string> {
+  const response = await getClient(apiKey).chat.completions.create({
     model: "llama-3.3-70b-versatile",
     messages: [
       {
@@ -40,15 +40,14 @@ Be precise. Use numbers from the data. Do not be vague or generic.`
   });
 
   return response.choices[0]?.message?.content ?? "";
-
 }
 
 export async function chatWithExperiment(
   messages: { role: string; content: string }[],
-  experimentContext: string
+  experimentContext: string,
+  apiKey?: string
 ): Promise<string> {
-
-  const response = await getClient().chat.completions.create({
+  const response = await getClient(apiKey).chat.completions.create({
     model: "llama-3.3-70b-versatile",
     messages: [
       {
@@ -68,5 +67,4 @@ Help the researcher interpret results, suggest explanations, identify patterns, 
   });
 
   return response.choices[0]?.message?.content ?? "";
-
 }

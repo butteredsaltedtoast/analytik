@@ -2,9 +2,11 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useApiKey } from "@/context/ApiKeyContext";
 
 export default function FileUpload() {
   const router = useRouter();
+  const { apiKey } = useApiKey();
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -12,13 +14,11 @@ export default function FileUpload() {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Validate file type
     if (!file.name.endsWith(".csv") && !file.name.endsWith(".json")) {
       setError("Only .csv and .json files are supported.");
       return;
     }
 
-    // Validate file size (5MB max)
     if (file.size > 5 * 1024 * 1024) {
       setError("File must be under 5MB.");
       return;
@@ -28,7 +28,6 @@ export default function FileUpload() {
     setUploading(true);
 
     try {
-      // 1. Read file as text
       const text = await new Promise<string>((resolve, reject) => {
         const reader = new FileReader();
         reader.onload = () => resolve(reader.result as string);
@@ -36,10 +35,12 @@ export default function FileUpload() {
         reader.readAsText(file);
       });
 
-      // 2. POST to /api/analyze
       const res = await fetch("/api/analyze", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...(apiKey ? { "x-api-key": apiKey } : {}),
+        },
         body: JSON.stringify({ fileContent: text, fileName: file.name }),
       });
 
@@ -50,31 +51,6 @@ export default function FileUpload() {
 
       const { analysis } = await res.json();
 
-      // STUB — remove when backend is ready
-    // await new Promise((r) => setTimeout(r, 1500)); // fake delay
-
-    //   const analysis = `
-    //   ## Key Findings
-    //   - Temperature and yield show an inverse relationship above 30°C
-    //   - Peak yield of 92% occurs at 30°C and 1.5 atm
-
-    //   ## Invisible Architecture
-    //   - Pressure and temperature are linearly correlated in this dataset (r=0.99)
-    //   - The yield curve suggests a reaction optimum near 28-32°C
-
-    //   ## Hidden Problems
-    //   - Only 4 data points — insufficient for statistical significance
-    //   - No replicate measurements to assess reproducibility
-    //   - Pressure and temperature are confounded — cannot isolate effects
-
-    //   ## Proposed Next Experiments
-    //   - Hold temperature at 30°C and vary pressure from 0.5 to 3.0 atm
-    //   - Add replicates (n=3) at each condition
-    //   - Test temperatures 28, 29, 30, 31, 32°C at fixed pressure`;
-
-      
-
-      // 3. Save to localStorage
       const experiment = {
         id: crypto.randomUUID(),
         name: file.name,
@@ -89,7 +65,6 @@ export default function FileUpload() {
       stored.push(experiment);
       localStorage.setItem("analytik-experiments", JSON.stringify(stored));
 
-      // 4. Redirect to experiment page
       router.push(`/experiments/${experiment.id}`);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong");

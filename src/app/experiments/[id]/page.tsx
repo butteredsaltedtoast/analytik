@@ -66,7 +66,6 @@ export default function ExperimentPage() {
       exit={{ opacity: 0, scale: 0.9, y: 20 }}
       transition={{ duration: 0.8, ease: "easeOut" }}
     >
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold">{experiment.name}</h1>
@@ -92,7 +91,6 @@ export default function ExperimentPage() {
         </Link>
       </div>
 
-      {/* Tabs */}
       <div className="flex gap-1 border-b border-gray-800">
         {(["data", "analysis", "chat"] as const).map((tab) => (
           <button
@@ -108,7 +106,6 @@ export default function ExperimentPage() {
         ))}
       </div>
 
-      {/* Tab content — all rendered, hidden via CSS to preserve state */}
       <AnimatePresence mode="wait">
         {activeTab === "data" && (
           <motion.div
