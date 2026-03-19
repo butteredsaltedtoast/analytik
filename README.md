@@ -9,12 +9,12 @@ Upload experiment data (CSV/JSON) → Gemini analyzes it → researcher chats wi
 ## Stack
 - Next.js 14, App Router, TypeScript
 - Tailwind CSS
-- google-genai SDK (Gemini 2.0 Flash)
+- llama-3.3-70b-versatile
 - localStorage for persistence (no database)
 
 ## File Structure
 - `src/lib/types.ts` — Experiment and ChatMessage types
-- `src/lib/gemini.ts` — Gemini client (analyzeExperiment, chatWithExperiment)
+- `src/lib/gemini.ts` — Llama client (analyzeExperiment, chatWithExperiment)
 - `src/app/layout.tsx` — Root layout with nav
 - `src/app/page.tsx` — Landing page
 - `src/app/experiments/page.tsx` — Experiment list (reads localStorage)
@@ -27,7 +27,6 @@ Upload experiment data (CSV/JSON) → Gemini analyzes it → researcher chats wi
 - `src/app/api/chat/route.ts` — POST: chat about experiment
 
 ## Key Details
-- Model: gemini-2.0-flash
-- API key env var: GEMINI_API_KEY
-- localStorage key: "analytik-experiments"
+- Users go to `console.groq.com` to get their own API key for individual use.
+- Model: llama-3.3-70b-versatile
 - Analysis sections: Key Findings, Invisible Architecture, Hidden Problems, Proposed Next Experiments
